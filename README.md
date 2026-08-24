@@ -1,130 +1,81 @@
-\#  Homelab — ricardo-acuna.com
-
-
+# Homelab — ricardo-acuna.com
 
 Personal homelab running on a Dell OptiPlex 3080M with Proxmox VE, Docker, Cloudflare Tunnel and Authelia SSO.
 
+## Hardware
 
+| Component | Spec |
+|---|---|
+| Server | Dell OptiPlex 3080M |
+| CPU | Intel Core i5-10500T (6 cores / 12 threads) |
+| RAM | 16 GB DDR4 3200MHz |
+| Storage | 256 GB NVMe SSD |
+| Hypervisor | Proxmox VE 9.1.1 |
 
-\##  Hardware
-
-\- \*\*Server:\*\* Dell OptiPlex 3080M
-
-\- \*\*CPU:\*\* Intel Core i5-10500T (6 cores / 12 threads)
-
-\- \*\*RAM:\*\* 16 GB DDR4 3200MHz
-
-\- \*\*Storage:\*\* 256 GB NVMe SSD
-
-\- \*\*Hypervisor:\*\* Proxmox VE 9.1.1
-
-
-
-\##  Architecture
+## Architecture
 
 Internet → Cloudflare Tunnel → Nginx Proxy Manager → Authelia (SSO) → Services
 
 
-
 Remote access via Tailscale VPN.
 
-
-
-\##  Services
+## Services
 
 | Service | Description | URL |
-
 |---|---|---|
-
-| Homepage | Dashboard | home.ricardo-acuna.com |
-
+| Homepage | Personal dashboard | home.ricardo-acuna.com |
 | Vaultwarden | Password manager | vault.ricardo-acuna.com |
-
 | Filebrowser | File manager | files.ricardo-acuna.com |
-
 | Authelia | SSO Authentication | auth.ricardo-acuna.com |
-
 | Portainer | Docker management | portainer.ricardo-acuna.com |
-
-| Obsidian LiveSync | Notes sync (CouchDB) | obsidian.ricardo-acuna.com |
-
+| Obsidian LiveSync | Notes sync via CouchDB | obsidian.ricardo-acuna.com |
 | CarMan | Car workshop management system | taller.ricardo-acuna.com |
 
+## Security
 
+| Layer | Technology | Purpose |
+|---|---|---|
+| Tunnel | Cloudflare Tunnel | No open ports, all traffic through Cloudflare |
+| Authentication | Authelia | SSO with username/password, 1 month session |
+| VPN | Tailscale | Private mesh VPN for Proxmox access |
+| Proxy | Nginx Proxy Manager | Reverse proxy with forward-auth |
 
-\##  Security
-
-\- \*\*Cloudflare Tunnel\*\* — No open ports, traffic through Cloudflare
-
-\- \*\*Authelia\*\* — Single Sign-On with username/password (1 month session)
-
-\- \*\*Tailscale\*\* — Private VPN mesh for Proxmox access
-
-\- \*\*NPM\*\* — Reverse proxy with forward-auth
-
-
-
-\##  Structure
+## Repository Structure
 
 homelab/
-
 ├── docker/
-
-│ ├── docker-compose.yml # Main stack
-
+│ ├── docker-compose.yml # Main services stack
 │ ├── .env.example # Environment variables template
-
 │ └── services/
-
-│ ├── authelia/ # Authelia config
-
-│ ├── homepage/ # Dashboard config
-
+│ ├── authelia/ # Authelia configuration
+│ ├── homepage/ # Dashboard configuration
 │ └── carman/ # Workshop management system
-
 ├── docs/
-
-│ ├── architecture.md
-
-│ └── screenshots/
-
+│ ├── architecture.md # Detailed architecture docs
+│ └── screenshots/ # Service screenshots
 ├── proxmox/
-
-│ └── setup.md
-
+│ └── setup.md # Proxmox installation guide
 └── scripts/
-
-└── setup.sh
-
+└── setup.sh # Initial setup script
 
 
-\##  Stack
+## Stack
 
-\- \*\*Proxmox VE\*\* — Hypervisor
+| Category | Technology |
+|---|---|
+| Hypervisor | Proxmox VE 9.1.1 |
+| OS | Debian GNU/Linux 13 (Trixie) |
+| Containers | Docker CE + Compose Plugin |
+| Tunnel | Cloudflare Tunnel (cloudflared) |
+| Proxy | Nginx Proxy Manager |
+| Auth | Authelia v4 |
+| VPN | Tailscale |
 
-\- \*\*Debian 13\*\* — VM OS
+## Deployment
 
-\- \*\*Docker + Compose\*\* — Container orchestration
+See [docs/architecture.md](docs/architecture.md) for the full deployment guide including Proxmox setup, VM creation, Docker installation and service configuration.
 
-\- \*\*Cloudflare Tunnel\*\* — Secure tunnel (no port forwarding)
+## Security Note
 
-\- \*\*Nginx Proxy Manager\*\* — Reverse proxy
-
-\- \*\*Authelia\*\* — Authentication
-
-\- \*\*Tailscale\*\* — VPN
-
-
-
-\##  Deployment
-
-See \[docs/architecture.md](docs/architecture.md) for full deployment guide.
-
-
-
-\##  Security Note
-
-All secrets and credentials are stored in `.env` files (not committed).
-
-Use `.env.example` as template.
-
+All secrets and credentials are stored in `.env` files which are not committed to this repository.
+Copy `.env.example` and fill in your own values before deploying.
