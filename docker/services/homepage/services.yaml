@@ -1,0 +1,23 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Personal:
+    - Vault:
+        href: https://vault.ricardo-acuna.com
+        description: Contraseñas
+        icon: vaultwarden.png
+    - Obsidian Sync:
+        href: https://obsidian.ricardo-acuna.com
+        description: CouchDB LiveSync
+        icon: obsidian.png
+    - Archivos:
+        href: https://files.ricardo-acuna.com
+        description: File Browser
+        icon: filebrowser.png
+
+- Administración:
+    - Portainer:
+        href: https://portainer.ricardo-acuna.com
+        description: Gestión Docker
+        icon: portainer.png

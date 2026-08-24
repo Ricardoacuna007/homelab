@@ -1,0 +1,121 @@
+services:
+
+  # ── TUNNEL ──────────────────────────────
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token CLOUDFLARE_TUNNEL_TOKEN
+    networks:
+      - homelab
+
+  # ── REVERSE PROXY ───────────────────────
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    volumes:
+      - ./nginx-proxy/data:/data
+      - ./nginx-proxy/letsencrypt:/etc/letsencrypt
+    networks:
+      - homelab
+
+  # ── DASHBOARD ───────────────────────────
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "example.com"
+    volumes:
+      - ./homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homelab
+
+  # ── VAULTWARDEN ─────────────────────────
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      DOMAIN: "https://vault.example.com"
+      SIGNUPS_ALLOWED: "true"
+    volumes:
+      - ./vaultwarden:/data
+    networks:
+      - homelab
+
+  # ── FILEBROWSER ─────────────────────────
+  filebrowser:
+    image: filebrowser/filebrowser:s6
+    container_name: filebrowser
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      - PUID=0
+      - PGID=0
+    volumes:
+      - ./projects:/srv
+      - ./filebrowser/database.db:/database.db
+      - ./filebrowser/settings.json:/.filebrowser.json
+    networks:
+      - homelab
+
+  # ── COUCHDB (Obsidian LiveSync) ──────────
+  couchdb:
+    image: couchdb:latest
+    container_name: obsidian-couchdb
+    restart: unless-stopped
+    ports:
+      - "5984:5984"
+    environment:
+      COUCHDB_USER: obsidian_user
+      COUCHDB_PASSWORD: COUCHDB_PASSWORD
+    volumes:
+      - ./couchdb/data:/opt/couchdb/data
+      - ./couchdb/config:/opt/couchdb/etc/local.d
+    healthcheck:
+      test: curl --fail -s -u obsidian_user:COUCHDB_PASSWORD http://localhost:5984/_up | grep -Eo '"status":"ok"' || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - homelab
+
+  # ── PORTAINER ───────────────────────────
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer:/data
+    networks:
+      - homelab
+
+#---AUTHELIA----------------------------
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./authelia/config:/config
+    networks:
+      - homelab
+networks:
+  homelab:
+    name: homelab

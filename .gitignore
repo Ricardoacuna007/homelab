@@ -1,0 +1,6 @@
+.env
+*.secret
+homepage/logs/
+*.log
+*.db
+*.sqlite3

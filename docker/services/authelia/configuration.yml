@@ -1,0 +1,43 @@
+theme: dark
+
+server:
+  address: 'tcp://:9091'
+
+log:
+  level: info
+
+totp:
+  issuer: ricardo-acuna.com
+
+authentication_backend:
+  file:
+    path: /config/users.yml
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: "*.ricardo-acuna.com"
+      policy: one_factor
+
+session:
+  secret: f69e30eb5f8c353840c7ca47feb4f5b65d8f71af4fb8a30d2793cd017484b1ca
+  cookies:
+    - domain: ricardo-acuna.com
+      authelia_url: https://auth.ricardo-acuna.com
+      expiration: 1M
+      inactivity: 1M
+
+storage:
+  encryption_key: df7b8865a22e6a20f1e66b494ef4583ad82dd192a0459ce9faec810268e14824
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  filesystem:
+    filename: /config/notification.txt
+
+identity_validation:
+  reset_password:
+    jwt_secret: 7300cf546d907cb4d92e46658005be0ca230bf7e400d8c4bdaf15dcb9c723767
+
+
